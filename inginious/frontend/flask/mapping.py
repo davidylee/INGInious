@@ -5,6 +5,7 @@
 
 from werkzeug.routing import BaseConverter
 
+from inginious.frontend.pages.admin.admin import AdministrationPage,AdministrationUsersPage
 from inginious.frontend.pages.maintenance import MaintenancePage
 from inginious.frontend.pages.utils import INGIniousStaticPage
 from inginious.frontend.pages.index import IndexPage
@@ -116,3 +117,5 @@ def init_flask_mapping(flask_app):
     flask_app.add_url_rule('/<cookieless:sessionid>api/v0/courses/<courseid>/tasks/<taskid>', view_func=APITasks.as_view('apitasks'))
     flask_app.add_url_rule('/<cookieless:sessionid>api/v0/courses/<courseid>/tasks/<taskid>/submissions', view_func=APISubmissions.as_view('apisubmissions.alias'))
     flask_app.add_url_rule('/<cookieless:sessionid>api/v0/courses/<courseid>/tasks/<taskid>/submissions/<submissionid>', view_func=APISubmissionSingle.as_view('apisubmissions'))
+    flask_app.add_url_rule('/<cookieless:sessionid>administrator', view_func=AdministrationPage.as_view('administrationpage'))
+    flask_app.add_url_rule('/<cookieless:sessionid>administrator/users', view_func=AdministrationUsersPage.as_view('administrationuserspage'))

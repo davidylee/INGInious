@@ -1,0 +1,65 @@
+{# This file is part of INGInious. See the LICENSE and the COPYRIGHTS files for #}
+{# more information about the licensing of this file. #}
+
+{% extends "layout.html" %}
+{% block title %}{{_("Users Administration") }}{% endblock %}
+{% block column %}
+    {% if not user_manager.session_logged_in() %}
+        {% include "signin_button.html" %}
+    {% else %}
+        {{ template_helper.call('main_menu', template_helper=template_helper) | safe }}
+    {% endif %}
+{% endblock %}
+{% block navbar %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active"><a href="#"><i class="fa fa-th-list fa-fw"></i> {{ _("Users Admin") }}
+                <span class="sr-only">{{_("(current)")}}</span></a></li>
+        </ol>
+    </nav>
+{% endblock %}
+{% block content %}
+
+<h2>{{ _("Users Administration") }}</h2>
+<div class="card-deck m-0">
+    <table class="table">
+        <thead class="table-borderless">
+            <tr>
+                <th>{{_("member")}}</th>
+                <th>{{_("username")}}</th>
+                <th>{{_("email address")}}</th>
+                <th>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a href="#" class="btn btn-info"
+                           title="{{ _('Download CSV') }}" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-table"></i></a>
+                        <a href="#" class="btn btn-secondary"
+                           title="{{ _('View  all submissions') }}" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-search"></i></a>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in all_users %}
+
+             <tr>
+                <td>
+                    {{ all_users[user]["realname"] or all_users[user]["username"] }}
+                </td>
+                <td>
+                    {{all_users[user]["username"]}}
+                </td>
+                <td>
+                    <a href="mailto:{{all_users[user]['email']}}">{{all_users[user]["email"]}}</a>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a href="#" class="btn btn-secondary" title="{{ _('View submissions') }}"
+                           data-toggle="tooltip" data-placement="bottom"><i class="fa fa-search"></i></a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

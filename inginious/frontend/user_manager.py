@@ -324,6 +324,15 @@ class UserManager:
                               self.session_email(), ip)
         self._destroy_session()
 
+    def get_users(self):
+        retval ={}
+        infos = self._database.users.find()
+        for info in infos:
+            retval[info["username"]] = UserInfo(info["realname"], info["email"], info["username"], info["bindings"],
+                                                info["language"])
+
+        return retval
+
     def get_users_info(self, usernames) -> Dict[str, Optional[UserInfo]]:
         """
         :param usernames: a list of usernames
