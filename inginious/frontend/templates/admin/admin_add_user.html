@@ -1,0 +1,22 @@
+{# This file is part of INGInious. See the LICENSE and the COPYRIGHTS files for #}
+{# more information about the licensing of this file. #}
+
+{% extends "layout.html" %}
+{% block title %}{{_("Users Administration") }}{% endblock %}
+{% block column %}
+    {% if not user_manager.session_logged_in() %}
+        {% include "signin_button.html" %}
+    {% else %}
+        {{ template_helper.call('main_menu', template_helper=template_helper) | safe }}
+    {% endif %}
+{% endblock %}
+{% block navbar %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active"><a href="#"><i class="fa fa-th-list fa-fw"></i> {{ _("Users Admin") }}
+                <span class="sr-only">{{_("(current)")}}</span></a></li>
+        </ol>
+    </nav>
+{% endblock %}
+{% block content %}
+{% endblock %}

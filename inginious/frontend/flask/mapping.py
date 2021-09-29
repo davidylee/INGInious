@@ -6,7 +6,7 @@
 from werkzeug.routing import BaseConverter
 
 from inginious.frontend.pages.admin.admin import AdministrationPage, AdministrationUsersPage, \
-    AdministrationUserActionPage
+    AdministrationUserActionPage, AdministrationUserAddPage
 from inginious.frontend.pages.maintenance import MaintenancePage
 from inginious.frontend.pages.utils import INGIniousStaticPage
 from inginious.frontend.pages.index import IndexPage
@@ -154,5 +154,7 @@ def init_flask_mapping(flask_app):
                            view_func=AdministrationPage.as_view('administrationpage'))
     flask_app.add_url_rule('/<cookieless:sessionid>administrator/users',
                            view_func=AdministrationUsersPage.as_view('administrationuserspage'))
+    flask_app.add_url_rule('/<cookieless:sessionid>administrator/user_add',
+                           view_func=AdministrationUserAddPage.as_view('administrationuseraddpage'))
     flask_app.add_url_rule('/<cookieless:sessionid>administrator/user_action',
                            view_func=AdministrationUserActionPage.as_view('administrationuseractionpage'))

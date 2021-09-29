@@ -50,3 +50,11 @@ class AdministrationUserActionPage(INGIniousAdministratorPage):
             print("COUCOU DELETE")
             self.user_manager.delete_user(username)
         return redirect("/administrator/users")
+
+
+class AdministrationUserAddPage(INGIniousAdministratorPage):
+    def GET_AUTH(self):
+        return self.template_helper.render("admin/admin_add_user.html")
+
+    def POST_AUTH(self):
+        pass
