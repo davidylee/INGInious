@@ -288,7 +288,7 @@ class UserManager:
         Authenticate the user in database
         :param username: Username/Login
         :param password: User password
-        :return: Returns a dict represrnting the user
+        :return: Returns a dict representing the user
         """
         password_hash = hashlib.sha512(password.encode("utf-8")).hexdigest()
 
@@ -297,6 +297,11 @@ class UserManager:
 
         return user if user is not None and self.connect_user(username, user["realname"], user["email"],
                                                               user["language"], user.get("tos_accepted", False)) else None
+
+    def is_user_activated(self, username):
+        user = self._database.users.find_one(
+            {"username": username, "activate": {"$exists": True, "$nin": [None]}})
+        return user is None
 
     def connect_user(self, username, realname, email, language, tos_accepted):
         """ Opens a session for the user
@@ -393,6 +398,22 @@ class UserManager:
             apikey = retval.get("apikey", None)
         return apikey
 
+    def get_user_activate_hash(self, username):
+        retval = self._database.users.find_one({"username": username})
+        if not retval or "activate" not in retval:
+            return None
+        else:
+            return retval["activate"]
+
+
+    def activate_user(self, activate_hash):
+        """ Activates user """
+        error = False
+        user = self._database.users.find_one_and_update({"activate": activate_hash}, {"$unset": {"activate": True}})
+        if user is None:
+            error = True
+        return error
+
     def bind_user(self, auth_id, user):
         username, realname, email, additional = user
 
@@ -438,6 +459,11 @@ class UserManager:
                 self.connect_user("", realname, email, self._session.get("language", "en"), False)
 
         return True
+
+    def delete_user(self, username):
+        # justOne option makes sure deletion on just one user.
+        # Not mandatory, here to be sure of no side effect.
+        self._database.users.remove({"username": username}, True)
 
     ##############################################
     #      User task/course info management      #

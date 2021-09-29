@@ -20,7 +20,11 @@
 {% endblock %}
 {% block content %}
 
+
 <h2>{{ _("Users Administration") }}</h2>
+<div>
+    <a href="#">Create user</a>
+</div>
 <div class="card-deck m-0">
     <table class="table">
         <thead class="table-borderless">
@@ -32,8 +36,6 @@
                     <div class="btn-group btn-group-sm" role="group">
                         <a href="#" class="btn btn-info"
                            title="{{ _('Download CSV') }}" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-table"></i></a>
-                        <a href="#" class="btn btn-secondary"
-                           title="{{ _('View  all submissions') }}" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-search"></i></a>
                     </div>
                 </th>
             </tr>
@@ -53,8 +55,21 @@
                 </td>
                 <td>
                     <div class="btn-group btn-group-sm" role="group">
-                        <a href="#" class="btn btn-secondary" title="{{ _('View submissions') }}"
-                           data-toggle="tooltip" data-placement="bottom"><i class="fa fa-search"></i></a>
+
+                        <a href="#" class="btn btn-secondary" title="{{ _('Binding user') }}"
+                           data-toggle="tooltip" data-placement="bottom"><i class="fa fa-cloud"></i></a>
+                        {% if all_users[user]["username"] != user_manager.session_username() %}
+                            {% if not user_manager.is_user_activated(all_users[user]["username"]) %}
+                                <button type="button" data-username="{{all_users[user]['username']}}"
+                                    data-type="single" data-toggle="modal"
+                                    data-target="#activate_modal"
+                                    class="btn btn-success activate_user" title="Activate"><i class="fa fa-thumbs-o-up"></i></button>
+                            {% endif %}
+                            <button type="button" data-username="{{all_users[user]['username']}}"
+                                    data-type="single" data-toggle="modal"
+                                    data-target="#delete_modal"
+                                    class="btn btn-danger delete_user" title="Delete"><i class="fa fa-trash"></i></button>
+                        {% endif %}
                     </div>
                 </td>
             </tr>
@@ -62,4 +77,78 @@
         </tbody>
     </table>
 </div>
+
+<!-- Modals -->
+<div id="delete_modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{ _("Delete") }} <span class="username"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ _("This will delete {}. Are you sure ?").format('<span class="username"></span>') | safe }}</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" name="username" id="username">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Cancel")}}</button>
+                <button type="submit" name="delete user" data-action="delete" class="btn btn-danger">{{ _("Remove") | safe }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="activate_modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{ _("Activate") }} <span class="username"></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ _("This will activate {}.").format('<span class="username"></span>') | safe }}</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" name="username" id="username">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Cancel")}}</button>
+                <button type="submit" name="activate user" data-action="activate" class="btn btn-success">{{ _("Activate") | safe }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#delete_modal').on('show.bs.modal', function (event) {
+      $('.modal-dialog .username').each(function (index) {
+          $(this).text($(event.relatedTarget).data('username'));
+      });
+      $('.modal-dialog #username').val($(event.relatedTarget).data('username'));
+    });
+    $('#activate_modal').on('show.bs.modal', function (event) {
+      $('.modal-dialog .username').each(function (index) {
+          $(this).text($(event.relatedTarget).data('username'));
+      });
+      $('.modal-dialog #username').val($(event.relatedTarget).data('username'));
+    });
+    $(".delete_user").each(function(index) {
+        $(this).tooltip({"placement": "bottom"});
+    });
+    $(".activate_user").each(function(index) {
+        $(this).tooltip({"placement": "bottom"});
+    });
+    $("button:submit").on("click",function(){
+        var username=$('#username').val();
+        var action = $(this).data("action");
+        $.ajax({
+          type: "POST",
+          url: window.location.protocol + "//" + window.location.host+"/administrator/user_action",
+          data: {
+            "username":username,
+            "action":action
+          },
+        }).done(function() {
+          window.location.href = window.location.protocol + "//" + window.location.host+"/administrator/users";
+        });
+    });
+</script>
+
 {% endblock %}

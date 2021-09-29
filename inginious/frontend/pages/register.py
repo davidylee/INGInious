@@ -34,7 +34,8 @@ class RegistrationPage(INGIniousPage):
         data = flask.request.args
 
         if "activate" in data:
-            msg, error = self.activate_user(data)
+            error = self.user_manager.activate_user(data["activate"])
+            msg = _("Invalid activation hash.") if error else _("User successfully activated.")
         elif "reset" in data:
             msg, error, reset = self.get_reset_data(data)
 
@@ -54,18 +55,6 @@ class RegistrationPage(INGIniousPage):
             reset = {"hash": data["reset"], "username": user["username"], "realname": user["realname"]}
 
         return msg, error, reset
-
-    def activate_user(self, data):
-        """ Activates user """
-        error = False
-        user = self.database.users.find_one_and_update({"activate": data["activate"]}, {"$unset": {"activate": True}})
-        if user is None:
-            error = True
-            msg = _("Invalid activation hash.")
-        else:
-            msg = _("You are now activated. You can proceed to login.")
-
-        return msg, error
 
     def register_user(self, data):
         """ Parses input and register user """
