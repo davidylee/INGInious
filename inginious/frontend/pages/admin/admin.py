@@ -7,7 +7,7 @@
 import json
 
 import flask
-from flask import redirect
+from flask import redirect, request
 from inginious.frontend.pages.utils import INGIniousAdministratorPage
 
 
@@ -41,9 +41,9 @@ class AdministrationUsersPage(INGIniousAdministratorPage):
 
 class AdministrationUserActionPage(INGIniousAdministratorPage):
     def POST(self):
-        username = flask.request.form.get("username")
+        username = request.form.get("username")
         activate_hash = self.user_manager.get_user_activate_hash(username)
-        action = flask.request.form.get("action")
+        action = request.form.get("action")
         if action == "activate":
             self.user_manager.activate_user(activate_hash)
         elif action == "delete":
@@ -53,8 +53,24 @@ class AdministrationUserActionPage(INGIniousAdministratorPage):
 
 
 class AdministrationUserAddPage(INGIniousAdministratorPage):
-    def GET_AUTH(self):
+    def GET(self):
         return self.template_helper.render("admin/admin_add_user.html")
 
-    def POST_AUTH(self):
-        pass
+    def POST(self):
+        data = request.form  # a multidict containing POST data
+        username = data["username"]
+        realname = data["realname"]
+        email = data["email"]
+        password = data["password"]
+        import hashlib
+        feedback = self.user_manager.create_user({
+                "username": username,
+                "realname": realname,
+                "email": email,
+                "password": hashlib.sha512(password.encode("utf-8")).hexdigest(),
+                "bindings": {},
+                "language": "en"})
+        if feedback:
+            all_users = self.user_manager.get_users()
+            return self.template_helper.render("admin/admin_users.html", all_users=all_users, feedback=feedback)
+        return redirect("/administrator/users")

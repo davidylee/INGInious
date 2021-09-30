@@ -25,6 +25,9 @@
 <div>
     <a id="add_user" class="btn-sm btn btn-info" href="{{ get_homepath() }}/administrator/user_add"><i class="fa fa-user-plus"></i>{{_("Create User")}}</a>
 </div>
+{% if feedback %}
+    <p>{{feedback}}</p>
+{% endif %}
 <div class="card-deck m-0">
     <table class="table">
         <thead class="table-borderless">

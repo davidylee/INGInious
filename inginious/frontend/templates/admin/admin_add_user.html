@@ -19,4 +19,27 @@
     </nav>
 {% endblock %}
 {% block content %}
+    <form method="post" class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-12">
+                <label class="control-label">{{ _("Username (min. 4 alphanumerical characters) :") }} </label>
+                <input name="username" type="text" class="form-control">
+            </div>
+            <div class="col-sm-12">
+                <label class="control-label">{{ _("Complete name :") }} </label>
+                <input name="realname" type="text" class="form-control">
+            </div>
+            <div class="col-sm-12">
+                <label class="control-label">{{ _("Email address :") }} </label>
+                <input name="email" type="text" class="form-control">
+            </div>
+            <div class="col-sm-12">
+                <label class="control-label">{{ _("Password (min. 6 characters) :") }} </label>
+                <input name="password" type="password" class="form-control">
+            </div>
+            <div class="col-sm-12"><br />
+                <button type="submit" name="register" class="btn btn-primary btn-block"><i class="fa fa-sign-in"></i> {{ _("Create") }}</button>
+            </div>
+        </div>
+    </form>
 {% endblock %}

@@ -465,6 +465,19 @@ class UserManager:
         # Not mandatory, here to be sure of no side effect.
         self._database.users.remove({"username": username}, True)
 
+    def create_user(self, values):
+        already_exits_user = self._database.users.find_one({"$or":[{"username":values["username"]},{"email":values["email"]}]})
+        if already_exits_user is None:
+            self._database.users.insert({"username": values["username"],
+                               "realname": values["realname"],
+                               "email": values["email"],
+                               "password": hashlib.sha512(values["password"].encode("utf-8")).hexdigest(),
+                               "bindings": {},
+                               "language": "en"})
+            return None
+        else:
+            return _("We were not able to create user with given params.")
+
     ##############################################
     #      User task/course info management      #
     ##############################################
