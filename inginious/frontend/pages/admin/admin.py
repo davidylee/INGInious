@@ -47,7 +47,6 @@ class AdministrationUserActionPage(INGIniousAdministratorPage):
         if action == "activate":
             self.user_manager.activate_user(activate_hash)
         elif action == "delete":
-            print("COUCOU DELETE")
             self.user_manager.delete_user(username)
         return redirect("/administrator/users")
 
