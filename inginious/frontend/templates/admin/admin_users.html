@@ -158,13 +158,32 @@
         $('.modal-dialog #username').val($(event.relatedTarget).data('username'));
         var username=$('#username').val();
         var bindings = $('#binding_'+username).data("bindings");
-        var jsoned_bindings = JSON.parse(JSON.stringify(bindings));
-        console.log(typeof(jsoned_bindings));
+        var jsoned_bindings = JSON.parse(bindings.replaceAll("'",'"'));
         for (const elem in jsoned_bindings) {
-          $("#binding_content").append('<p>'+elem+'</p>');
+            var htmlcontent ="<div class=\"card mb-3\">" +
+                "            <div class=\"card-header\">" +
+                                elem+
+                "                <div class=\"pull-right\">" +
+                "                    <a href='#' class='binding_revoke' data-username=\""+username+"\" data-binding=\""+elem+"\" data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"{{ _('Revoke access') }}\">" +
+                "                        <i style=\"color:red;\" class=\"fa fa-trash-o fa-fw\"></i>" +
+                "                    </a>" +
+                "                </div>" +
+                "            </div>" +
+                "            <div class=\"card-body\">" +
+                "                <div class=\"row\">" +
+                "                    <div class=\"col-md-11\">" +
+                "                        <p>Identifier :"+ jsoned_bindings[elem][0] +"</p>" +
+                "                    </div>" +
+                "                </div>" +
+                "            </div>" +
+                "        </div>";
+
+            $("#binding_content").append(htmlcontent);
         }
-
-
+        $('.binding_revoke').bind("click", revoke_binding);
+    });
+    $('#binding_modal').on('hide.bs.modal', function (event) {
+        $("#binding_content").html('');
     });
     $(".delete_user").each(function(index) {
         $(this).tooltip({"placement": "bottom"});
@@ -186,6 +205,22 @@
           window.location.href = window.location.protocol + "//" + window.location.host+"/administrator/users";
         });
     });
+    function revoke_binding(event){
+        var username = $(this).data("username");
+        var binding_id = $(this).data("binding");
+        var action ="revoke_binding";
+        $.ajax({
+          type: "POST",
+          url: window.location.protocol + "//" + window.location.host+"/administrator/user_action",
+          data: {
+            "username":username,
+            "action":action,
+            "binding_id": binding_id
+          },
+        }).done(function() {
+          window.location.href = window.location.protocol + "//" + window.location.host+"/administrator/users";
+        });
+    }
 </script>
 
 {% endblock %}
