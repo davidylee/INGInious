@@ -50,10 +50,7 @@ class AdministrationUserActionPage(INGIniousAdministratorPage):
             self.user_manager.delete_user(username)
         elif action == "revoke_binding":
             binding_id = request.form.get("binding_id")
-            print(action)
-            print(username)
-            print(binding_id)
-
+            error, msg = self.user_manager.revoke_binding(username, binding_id)
         return redirect("/administrator/users")
 
 

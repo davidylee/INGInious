@@ -17,6 +17,7 @@ from functools import reduce
 from natsort import natsorted
 from collections import OrderedDict, namedtuple
 import pymongo
+from pymongo import ReturnDocument
 from binascii import hexlify
 import os
 
@@ -459,6 +460,23 @@ class UserManager:
                 self.connect_user("", realname, email, self._session.get("language", "en"), False)
 
         return True
+
+    def revoke_binding(self, username, binding_id):
+        user_data = self._database.users.find_one({"username": username})
+        if binding_id not in self.get_auth_methods().keys():
+            error = True
+            msg = _("Incorrect authentication binding.")
+        elif len(user_data.get("bindings", {}).keys()) > 1 or "password" in user_data:
+            user_data = self._database.users.find_one_and_update(
+                {"username": username},
+                {"$unset": {"bindings." + binding_id: 1}},
+                return_document=ReturnDocument.AFTER)
+            msg=""
+            error = False
+        else:
+            error = True
+            msg = _("You must set a password before removing all bindings.")
+        return error, msg
 
     def delete_user(self, username):
         # justOne option makes sure deletion on just one user.
