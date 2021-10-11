@@ -160,25 +160,12 @@
         var bindings = $('#binding_'+username).data("bindings");
         var jsoned_bindings = JSON.parse(bindings.replaceAll("'",'"'));
         for (const elem in jsoned_bindings) {
-            var htmlcontent ="<div class=\"card mb-3\">" +
-                "            <div class=\"card-header\">" +
-                                elem+
-                "                <div class=\"pull-right\">" +
-                "                    <a href='#' class='binding_revoke' data-username=\""+username+"\" data-binding=\""+elem+"\" data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"{{ _('Revoke access') }}\">" +
-                "                        <i style=\"color:red;\" class=\"fa fa-trash-o fa-fw\"></i>" +
-                "                    </a>" +
-                "                </div>" +
-                "            </div>" +
-                "            <div class=\"card-body\">" +
-                "                <div class=\"row\">" +
-                "                    <div class=\"col-md-11\">" +
-                "                        <p>Identifier :"+ jsoned_bindings[elem][0] +"</p>" +
-                "                    </div>" +
-                "                </div>" +
-                "            </div>" +
-                "        </div>";
-
-            $("#binding_content").append(htmlcontent);
+            var template = $('#hidden-template').html();
+            $("#binding_content").append(template);
+            $(".binding_method").text(elem);
+            $(".binding_revoke").data("username",username);
+            $(".binding_revoke").data("binding",elem);
+            $(".binding_identifier").text(jsoned_bindings[elem][0]);
         }
         $('.binding_revoke').bind("click", revoke_binding);
     });
@@ -196,13 +183,13 @@
         var action = $(this).data("action");
         $.ajax({
           type: "POST",
-          url: window.location.protocol + "//" + window.location.host+"/administrator/user_action",
+          url: "{{get_homepath()}}/administrator/user_action",
           data: {
             "username":username,
             "action":action
           },
         }).done(function() {
-          window.location.href = window.location.protocol + "//" + window.location.host+"/administrator/users";
+          window.location.href = "{{get_homepath()}}/administrator/users";
         });
     });
     function revoke_binding(event){
@@ -211,16 +198,36 @@
         var action ="revoke_binding";
         $.ajax({
           type: "POST",
-          url: window.location.protocol + "//" + window.location.host+"/administrator/user_action",
+          url: "{{get_homepath()}}/administrator/user_action",
           data: {
             "username":username,
             "action":action,
             "binding_id": binding_id
           },
         }).done(function() {
-          window.location.href = window.location.protocol + "//" + window.location.host+"/administrator/users";
+          window.location.href = "{{get_homepath()}}/administrator/users";
         });
     }
+
+</script>
+<script id="hidden-template" type="text/x-custom-template">
+    <div class="card mb-3">
+        <div class="card-header">
+            <span class="binding_method"></span>
+            <div class="pull-right">
+            <a href='#' class='binding_revoke' data-username="" data-binding="" data-toggle="tooltip" data-placement="bottom" title="{{ _('Revoke access') }}">
+                <i style="color:red;" class="fa fa-trash-o fa-fw"></i>
+            </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-11">
+                    <p>Identifier :<span class="binding_identifier"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </script>
 
 {% endblock %}
