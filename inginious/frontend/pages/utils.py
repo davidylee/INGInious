@@ -232,19 +232,14 @@ class INGIniousAuthPage(INGIniousPage):
         return False
 
 
-class INGIniousAdministratorPage(INGIniousPage):
+class INGIniousAdministratorPage(INGIniousAuthPage):
     """
-       Augmented version of INGIniousPage that checks if user is administrator (superadmin).
+       Augmented version of INGIniousAuthPage that checks if user is administrator (superadmin).
     """
-    def POST_AUTH(self, *args, **kwargs):
-        raise NotAcceptable()
-
-    def GET_AUTH(self, *args, **kwargs):
-        raise NotAcceptable()
 
     def GET(self, *args, **kwargs):
         """
-        Checks if user is authenticated and calls GET_AUTH or performs logout.
+        Checks if user is admin and calls GET_AUTH or performs logout.
         Otherwise, returns the login template.
         """
         username = self.user_manager.session_username()
@@ -277,7 +272,7 @@ class INGIniousAdministratorPage(INGIniousPage):
 
     def POST(self, *args, **kwargs):
         """
-                Checks if user is authenticated and calls GET_AUTH or performs logout.
+                Checks if user is admin and calls GET_AUTH or performs logout.
                 Otherwise, returns the login template.
                 """
         username = self.user_manager.session_username()
@@ -305,14 +300,6 @@ class INGIniousAdministratorPage(INGIniousPage):
                           "permissions (name, email) and contact your INGInious administrator if the error persists.")
             return self.template_helper.render("auth.html", auth_methods=self.user_manager.get_auth_methods(),
                                                error=error)
-
-    @staticmethod
-    def preview_allowed(*args, **kwargs):
-        """
-            If this function returns True, the auth check is disabled.
-            Override this function with a custom check if needed.
-        """
-        return False
 
 class SignInPage(INGIniousAuthPage):
     def GET_AUTH(self, *args, **kwargs):
