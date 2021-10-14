@@ -158,14 +158,16 @@
         $('.modal-dialog #username').val($(event.relatedTarget).data('username'));
         var username=$('#username').val();
         var bindings = $('#binding_'+username).data("bindings");
-        var jsoned_bindings = JSON.parse(bindings.replaceAll("'",'"'));
-        for (const elem in jsoned_bindings) {
+        if (typeof(bindings) == "string"){
+            bindings = JSON.parse(bindings.replaceAll("'",'"'));
+        }
+        for (const elem in bindings) {
             var template = $('#hidden-template').html();
             $("#binding_content").append(template);
             $(".binding_method").text(elem);
             $(".binding_revoke").data("username",username);
             $(".binding_revoke").data("binding",elem);
-            $(".binding_identifier").text(jsoned_bindings[elem][0]);
+            $(".binding_identifier").text(bindings[elem][0]);
         }
         $('.binding_revoke').bind("click", revoke_binding);
     });
