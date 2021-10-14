@@ -244,62 +244,22 @@ class INGIniousAdministratorPage(INGIniousAuthPage):
         """
         username = self.user_manager.session_username()
         if self.user_manager.session_logged_in():
-            if (not self.user_manager.session_username() or (self.app.terms_page is not None and
-                                                             self.app.privacy_page is not None and
-                                                             not self.user_manager.session_tos_signed())) \
-                    and not self.__class__.__name__ == "ProfilePage":
-                return redirect("/preferences/profile")
-
-            if not self.is_lti_page and self.user_manager.session_lti_info() is not None:  # lti session
-                self.user_manager.disconnect_user()
-                return self.template_helper.render("auth.html", auth_methods=self.user_manager.get_auth_methods())
             if not self.user_manager.user_is_superadmin(username):
                 return self.template_helper.render("forbidden.html", message=_("You have not eligible right to see this part"))
-
             return self.GET_AUTH(*args, **kwargs)
-        elif self.preview_allowed(*args, **kwargs):
-            return self.GET_AUTH(*args, **kwargs)
-        else:
-            error = ''
-            if "binderror" in flask.request.args:
-                error = _("An account using this email already exists and is not bound with this service. "
-                          "For security reasons, please log in via another method and bind your account in your profile.")
-            if "callbackerror" in flask.request.args:
-                error = _("Couldn't fetch the required information from the service. Please check the provided "
-                          "permissions (name, email) and contact your INGInious administrator if the error persists.")
-            return self.template_helper.render("auth.html", auth_methods=self.user_manager.get_auth_methods(),
-                                               error=error)
+        return INGIniousAuthPage.GET(self, *args, **kwargs)
 
     def POST(self, *args, **kwargs):
         """
-                Checks if user is admin and calls GET_AUTH or performs logout.
-                Otherwise, returns the login template.
-                """
+        Checks if user is admin and calls GET_AUTH or performs logout.
+        Otherwise, returns the login template.
+        """
         username = self.user_manager.session_username()
         if self.user_manager.session_logged_in() and self.user_manager.user_is_superadmin(username):
-            if (not self.user_manager.session_username() or (self.app.terms_page is not None and
-                                                             self.app.privacy_page is not None and
-                                                             not self.user_manager.session_tos_signed())) \
-                    and not self.__class__.__name__ == "ProfilePage":
-                return redirect("/preferences/profile")
+            return self.template_helper.render("forbidden.html",
+                                               message=_("You have not eligible right to see this part"))
+        return INGIniousAuthPage.POST(self, *args, **kwargs)
 
-            if not self.is_lti_page and self.user_manager.session_lti_info() is not None:  # lti session
-                self.user_manager.disconnect_user()
-                return self.template_helper.render("auth.html", auth_methods=self.user_manager.get_auth_methods())
-
-            return self.GET_AUTH(*args, **kwargs)
-        elif self.preview_allowed(*args, **kwargs):
-            return self.GET_AUTH(*args, **kwargs)
-        else:
-            error = ''
-            if "binderror" in flask.request.args:
-                error = _("An account using this email already exists and is not bound with this service. "
-                          "For security reasons, please log in via another method and bind your account in your profile.")
-            if "callbackerror" in flask.request.args:
-                error = _("Couldn't fetch the required information from the service. Please check the provided "
-                          "permissions (name, email) and contact your INGInious administrator if the error persists.")
-            return self.template_helper.render("auth.html", auth_methods=self.user_manager.get_auth_methods(),
-                                               error=error)
 
 class SignInPage(INGIniousAuthPage):
     def GET_AUTH(self, *args, **kwargs):
